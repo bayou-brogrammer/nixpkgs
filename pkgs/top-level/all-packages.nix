@@ -922,20 +922,17 @@ with pkgs;
     type = "OPN";
   };
 
-  akkoma = callPackage ../servers/akkoma {
-    elixir = beam_nox.packages.erlang_26.elixir_1_16;
-    beamPackages = beam_nox.packages.erlang_26.extend (self: super: { elixir = self.elixir_1_16; });
+  akkoma = callPackage ../by-name/ak/akkoma/package.nix {
+    beamPackages = beam_nox.packages.erlang_26.extend (self: super: {
+      elixir = self.elixir_1_16;
+      rebar3 = self.rebar3WithPlugins {
+        plugins = with self; [ pc ];
+      };
+    });
   };
-  akkoma-frontends = recurseIntoAttrs {
-    akkoma-fe = callPackage ../servers/akkoma/akkoma-fe { };
-    admin-fe = callPackage ../servers/akkoma/admin-fe {
-      nodejs = nodejs_18;
-      yarn = yarn.override { nodejs = nodejs_18; };
-      python3 = python311;
-    };
-  };
-  akkoma-emoji = recurseIntoAttrs {
-    blobs_gg = callPackage ../servers/akkoma/emoji/blobs_gg.nix { };
+
+  akkoma-admin-fe = callPackage ../by-name/ak/akkoma-admin-fe/package.nix {
+    python3 = python311;
   };
 
   aegisub = callPackage ../by-name/ae/aegisub/package.nix ({
@@ -955,10 +952,6 @@ with pkgs;
   afsctool = callPackage ../tools/filesystems/afsctool { };
 
   aioblescan = with python3Packages; toPythonApplication aioblescan;
-
-  ajour = callPackage ../tools/games/ajour {
-    inherit (plasma5Packages) kdialog;
-  };
 
   inherit (recurseIntoAttrs (callPackage ../tools/package-management/akku { }))
     akku akkuPackages;
@@ -1196,7 +1189,9 @@ with pkgs;
 
   datalad-gooey = with python3Packages; toPythonApplication datalad-gooey;
 
-  forgejo-lts = callPackage ../by-name/fo/forgejo/lts.nix { };
+  forgejo-lts = callPackage ../by-name/fo/forgejo/lts.nix {
+    buildGoModule = buildGo123Module;
+  };
 
   gfold = callPackage ../applications/version-management/gfold { };
 
@@ -2445,8 +2440,6 @@ with pkgs;
 
   materialx = with python3Packages; toPythonApplication materialx;
 
-  megasync = libsForQt5.callPackage ../applications/misc/megasync { };
-
   # while building documentation meson may want to run binaries for host
   # which needs an emulator
   # example of an error which this fixes
@@ -3036,10 +3029,6 @@ with pkgs;
 
   dnsviz = python3Packages.callPackage ../tools/networking/dnsviz { };
 
-  diffoscope = callPackage ../tools/misc/diffoscope {
-    jdk = jdk8;
-  };
-
   diffoscopeMinimal = diffoscope.override {
     enableBloat = false;
   };
@@ -3151,9 +3140,7 @@ with pkgs;
 
   vorta = qt6Packages.callPackage ../applications/backup/vorta { };
 
-  worker-build = callPackage ../development/tools/worker-build {
-    inherit (darwin.apple_sdk.frameworks) Security;
-  };
+  worker-build = callPackage ../development/tools/worker-build { };
 
   wrangler_1 = callPackage ../development/tools/wrangler_1 {
     inherit (darwin.apple_sdk.frameworks) CoreFoundation CoreServices Security;
@@ -5039,6 +5026,7 @@ with pkgs;
   stutter = haskell.lib.compose.justStaticExecutables haskellPackages.stutter;
 
   strongswanTNC = strongswan.override { enableTNC = true; };
+  strongswanTPM = strongswan.override { enableTPM2 = true; };
   strongswanNM  = strongswan.override { enableNetworkManager = true; };
 
   stylish-haskell = haskell.lib.compose.justStaticExecutables haskellPackages.stylish-haskell;
@@ -7495,7 +7483,7 @@ with pkgs;
 
   electron_32 = electron_32-bin;
   electron_33 = if lib.meta.availableOn stdenv.hostPlatform electron-source.electron_33 then electron-source.electron_33 else electron_33-bin;
-  electron_34 = electron_34-bin;
+  electron_34 = if lib.meta.availableOn stdenv.hostPlatform electron-source.electron_34 then electron-source.electron_34 else electron_34-bin;
   electron = electron_34;
   electron-bin = electron_34-bin;
   electron-chromedriver = electron-chromedriver_34;
@@ -8159,6 +8147,10 @@ with pkgs;
   inherit (callPackage ../development/tools/replay-io { })
     replay-io replay-node-cli;
 
+  rescript-language-server = callPackage ../by-name/re/rescript-language-server/package.nix {
+    rescript-editor-analysis = vscode-extensions.chenglou92.rescript-vscode.rescript-editor-analysis;
+  };
+
   rnginline = with python3Packages; toPythonApplication rnginline;
 
   rr = callPackage ../development/tools/analysis/rr { };
@@ -8787,8 +8779,6 @@ with pkgs;
   gamenetworkingsockets = callPackage ../development/libraries/gamenetworkingsockets {
     protobuf = protobuf_21;
   };
-
-  gcovr = with python3Packages; toPythonApplication gcovr;
 
   gcr = callPackage ../development/libraries/gcr { };
 
@@ -11733,7 +11723,7 @@ with pkgs;
   sickgear = callPackage ../servers/sickbeard/sickgear.nix { };
 
   snipe-it = callPackage ../by-name/sn/snipe-it/package.nix {
-    php = php81;
+    php = php84;
   };
 
   spacecookie =
@@ -11939,8 +11929,6 @@ with pkgs;
     inherit (darwin) IOKit;
   };
 
-  htop-vim = callPackage ../tools/system/htop/htop-vim.nix { };
-
   humility = callPackage ../development/tools/rust/humility {
     inherit (darwin.apple_sdk.frameworks) AppKit;
   };
@@ -12035,6 +12023,10 @@ with pkgs;
   linuxPackages-rt_latest = linuxKernel.packageAliases.linux_rt_latest;
   linux-rt = linuxPackages-rt.kernel;
   linux-rt_latest = linuxPackages-rt_latest.kernel;
+
+  # Amateur Radio kernel
+  linuxPackages_ham = linuxKernel.packages.linux_ham;
+  linux_ham = linuxPackages_ham.kernel;
 
   # hardened kernels
   linuxPackages_hardened = linuxKernel.packages.linux_hardened;
@@ -13139,15 +13131,6 @@ with pkgs;
   };
 
   inherit (recurseIntoAttrs (callPackage ../applications/editors/emacs { }))
-    emacs28
-    emacs28-gtk3
-    emacs28-nox
-
-    emacs29
-    emacs29-gtk3
-    emacs29-nox
-    emacs29-pgtk
-
     emacs30
     emacs30-gtk3
     emacs30-nox
@@ -15622,7 +15605,7 @@ with pkgs;
 
   x32edit = callPackage ../applications/audio/midas/x32edit.nix { };
 
-  xaos = libsForQt5.callPackage ../applications/graphics/xaos { };
+  xaos = callPackage ../applications/graphics/xaos { };
 
   xbindkeys-config = callPackage ../tools/X11/xbindkeys-config {
     gtk = gtk2;
@@ -16250,10 +16233,6 @@ with pkgs;
   liquidwar5 = callPackage ../games/liquidwar/5.nix {
   };
 
-  macopix = callPackage ../games/macopix {
-    gtk = gtk2;
-  };
-
   maptool = callPackage ../games/maptool {
     # MapTool is fussy about which JRE it uses; OpenJDK will leave it hanging
     # at launch in a class initialization deadlock. MapTool ships Temurin with
@@ -16328,10 +16307,6 @@ with pkgs;
   openraPackages = recurseIntoAttrs (callPackage ../games/openra {});
 
   openra = openraPackages.engines.release;
-
-  openrw = callPackage ../games/openrw {
-    inherit (darwin.apple_sdk.frameworks) Cocoa OpenAL;
-  };
 
   openspades = callPackage ../games/openspades {
     inherit (darwin.apple_sdk.frameworks) Cocoa;
@@ -16865,6 +16840,10 @@ with pkgs;
   mathematica-webdoc-cuda = callPackage ../applications/science/math/mathematica {
     webdoc = true;
     cudaSupport = true;
+  };
+
+  math-preview = callPackage ../by-name/ma/math-preview/package.nix {
+    nodejs = nodejs_20;
   };
 
   or-tools = callPackage ../development/libraries/science/math/or-tools {
@@ -17522,6 +17501,16 @@ with pkgs;
 
   nix = nixVersions.stable;
 
+  # Overlays for CppNix nightly, Lix, or Tvix want to change the default Nix
+  # implementation in Nixpkgs by overriding `pkgs.nix`. However, some packages
+  # link against the internal/unstable CppNix APIs directly, and these packages
+  # will break if built with different versions or implementations of Nix.
+  #
+  # If you want to swap out the Nix implementation in your package set, you
+  # don't want these packages to break. Therefore, some packages will refer to
+  # `nixForLinking` explicitly, at least until these dependencies can be sorted out.
+  nixForLinking = nixVersions.stable;
+
   nixStatic = pkgsStatic.nix;
 
   lixVersions = recurseIntoAttrs (callPackage ../tools/package-management/lix {
@@ -17766,12 +17755,8 @@ with pkgs;
 
   xdragon = lowPrio (callPackage ../tools/X11/xdragon { });
 
-  sail-riscv-rv32 = callPackage ../applications/virtualization/sail-riscv {
-    arch = "RV32";
-  };
-
-  sail-riscv-rv64 = callPackage ../applications/virtualization/sail-riscv {
-    arch = "RV64";
+  sail-riscv = callPackage ../applications/virtualization/sail-riscv {
+    inherit (ocamlPackages) sail;
   };
 
   timeloop = pkgs.darwin.apple_sdk_11_0.callPackage ../applications/science/computer-architecture/timeloop { };

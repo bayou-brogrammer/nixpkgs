@@ -392,7 +392,7 @@ let
           name = "astro-vscode";
           publisher = "astro-build";
           version = "2.15.4";
-          hash = "sha256-gpDbEasdrpY9Djd6g9lUYXcMFZRBMn7P4wW0/iU+qz8=";
+          hash = "sha256-dyv7GTscj57Uc+HgImXETKW8olGcWpL+FyAHoS36rmk=";
         };
         meta = {
           changelog = "https://marketplace.visualstudio.com/items/astro-build.astro-vscode/changelog";
@@ -2105,8 +2105,8 @@ let
           publisher = "github";
           name = "copilot";
           # Verify which version is available with nix run nixpkgs#vsce -- show github.copilot --json
-          version = "1.279.1416"; # compatible with vscode ^1.97
-          hash = "sha256-t6d+YkOElpeggwZ86VDftVz2bjDx5Rl/yOn5L5+1R/g=";
+          version = "1.284.0";
+          hash = "sha256-SoagiauSRbBjYouW1QDC9ZNgMl9lDH+UwtuITKsZAz8=";
         };
 
         meta = {
@@ -3902,6 +3902,8 @@ let
         };
       };
 
+      oops418.nix-env-picker = callPackage ./oops418.nix-env-picker { };
+
       phind.phind = buildVscodeMarketplaceExtension {
         mktplcRef = {
           name = "phind";
@@ -4947,6 +4949,8 @@ let
         };
       };
 
+      tboby.cwtools-vscode = callPackage ./tboby.cwtools-vscode { };
+
       tomoki1207.pdf = buildVscodeMarketplaceExtension {
         mktplcRef = {
           name = "pdf";
@@ -5243,7 +5247,7 @@ let
         };
       };
 
-      vscjava.vscode-gradle = buildVscodeMarketplaceExtension rec {
+      vscjava.vscode-gradle = buildVscodeMarketplaceExtension {
         mktplcRef = {
           name = "vscode-gradle";
           publisher = "vscjava";

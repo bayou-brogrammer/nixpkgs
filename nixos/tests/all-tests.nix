@@ -147,48 +147,60 @@ in {
   _3proxy = runTest ./3proxy.nix;
   aaaaxy = runTest ./aaaaxy.nix;
   acme = import ./acme/default.nix { inherit runTest; };
-  acme-dns = handleTest ./acme-dns.nix {};
-  actual = handleTest ./actual.nix {};
+  acme-dns = runTest ./acme-dns.nix;
+  actual = runTest ./actual.nix;
   adguardhome = runTest ./adguardhome.nix;
   aesmd = runTestOn ["x86_64-linux"] ./aesmd.nix;
   agate = runTest ./web-servers/agate.nix;
-  agda = handleTest ./agda.nix {};
+  agda = runTest ./agda.nix;
   age-plugin-tpm-decrypt = runTest ./age-plugin-tpm-decrypt.nix;
   agorakit = runTest ./web-apps/agorakit.nix;
-  airsonic = handleTest ./airsonic.nix {};
-  akkoma = handleTestOn [ "x86_64-linux" "aarch64-linux" ] ./akkoma.nix {};
-  akkoma-confined = handleTestOn [ "x86_64-linux" "aarch64-linux" ] ./akkoma.nix { confined = true; };
-  alice-lg = handleTest ./alice-lg.nix {};
-  alloy = handleTest ./alloy.nix {};
-  allTerminfo = handleTest ./all-terminfo.nix {};
-  alps = handleTest ./alps.nix {};
-  amazon-cloudwatch-agent = handleTest ./amazon-cloudwatch-agent.nix {};
-  amazon-init-shell = handleTest ./amazon-init-shell.nix {};
-  amazon-ssm-agent = handleTest ./amazon-ssm-agent.nix {};
+  airsonic = runTest ./airsonic.nix;
+  akkoma = runTestOn [ "x86_64-linux" "aarch64-linux" ] {
+    imports = [ ./akkoma.nix ];
+    _module.args.confined = false;
+  };
+  akkoma-confined = runTestOn [ "x86_64-linux" "aarch64-linux" ] {
+    imports = [ ./akkoma.nix ];
+    _module.args.confined = true;
+  };
+  alice-lg = runTest ./alice-lg.nix;
+  alloy = runTest ./alloy.nix;
+  allTerminfo = runTest ./all-terminfo.nix;
+  alps = runTest ./alps.nix;
+  amazon-cloudwatch-agent = runTest ./amazon-cloudwatch-agent.nix;
+  amazon-init-shell = runTest ./amazon-init-shell.nix;
+  amazon-ssm-agent = runTest ./amazon-ssm-agent.nix;
   amd-sev = runTest ./amd-sev.nix;
-  angie-api = handleTest ./angie-api.nix {};
-  anki-sync-server = handleTest ./anki-sync-server.nix {};
-  anuko-time-tracker = handleTest ./anuko-time-tracker.nix {};
-  apcupsd = handleTest ./apcupsd.nix {};
+  angie-api = runTest ./angie-api.nix;
+  anki-sync-server = runTest ./anki-sync-server.nix;
+  anuko-time-tracker = runTest ./anuko-time-tracker.nix;
+  apcupsd = runTest ./apcupsd.nix;
   apfs = runTest ./apfs.nix;
   appliance-repart-image = runTest ./appliance-repart-image.nix;
   appliance-repart-image-verity-store = runTest ./appliance-repart-image-verity-store.nix;
-  apparmor = handleTest ./apparmor {};
-  archi = handleTest ./archi.nix {};
-  aria2 = handleTest ./aria2.nix {};
-  armagetronad = handleTest ./armagetronad.nix {};
+  apparmor = runTest ./apparmor;
+  archi = runTest ./archi.nix;
+  aria2 = runTest ./aria2.nix;
+  armagetronad = runTest ./armagetronad.nix;
   artalk = runTest ./artalk.nix;
-  atd = handleTest ./atd.nix {};
+  atd = runTest ./atd.nix;
   atop = handleTest ./atop.nix {};
   atticd = runTest ./atticd.nix;
   atuin = runTest ./atuin.nix;
-  audiobookshelf = handleTest ./audiobookshelf.nix {};
-  auth-mysql = handleTest ./auth-mysql.nix {};
-  authelia = handleTest ./authelia.nix {};
-  auto-cpufreq = handleTest ./auto-cpufreq.nix {};
-  autobrr = handleTest ./autobrr.nix {};
-  avahi = handleTest ./avahi.nix {};
-  avahi-with-resolved = handleTest ./avahi.nix { networkd = true; };
+  audiobookshelf = runTest ./audiobookshelf.nix;
+  auth-mysql = runTest ./auth-mysql.nix;
+  authelia = runTest ./authelia.nix;
+  auto-cpufreq = runTest ./auto-cpufreq.nix;
+  autobrr = runTest ./autobrr.nix;
+  avahi = runTest {
+    imports = [ ./avahi.nix ];
+    _module.args.networkd = false;
+  };
+  avahi-with-resolved = runTest {
+    imports = [ ./avahi.nix ];
+    _module.args.networkd = true;
+  };
   ayatana-indicators = runTest ./ayatana-indicators.nix;
   babeld = runTest ./babeld.nix;
   bazarr = handleTest ./bazarr.nix {};
@@ -416,7 +428,10 @@ in {
   flannel = handleTestOn ["x86_64-linux"] ./flannel.nix {};
   flaresolverr = handleTest ./flaresolverr.nix {};
   flood = handleTest ./flood.nix {};
-  floorp = handleTest ./firefox.nix { firefoxPackage = pkgs.floorp; };
+  floorp = runTest {
+    imports = [ ./firefox.nix ] ;
+    _module.args.firefoxPackage = pkgs.floorp;
+  };
   fluentd = handleTest ./fluentd.nix {};
   fluidd = handleTest ./fluidd.nix {};
   fontconfig-default-fonts = handleTest ./fontconfig-default-fonts.nix {};
@@ -607,7 +622,10 @@ in {
   libresprite = handleTest ./libresprite.nix {};
   libreswan = runTest ./libreswan.nix;
   libreswan-nat = runTest ./libreswan-nat.nix;
-  librewolf = handleTest ./firefox.nix { firefoxPackage = pkgs.librewolf; };
+  librewolf = runTest {
+    imports = [ ./firefox.nix ];
+    _module.args.firefoxPackage = pkgs.librewolf;
+  };
   libuiohook = handleTest ./libuiohook.nix {};
   libvirtd = handleTest ./libvirtd.nix {};
   lidarr = handleTest ./lidarr.nix {};
@@ -896,11 +914,26 @@ in {
   phosh = handleTest ./phosh.nix {};
   photonvision = handleTest ./photonvision.nix {};
   photoprism = handleTest ./photoprism.nix {};
-  php = handleTest ./php {};
-  php81 = handleTest ./php { php = pkgs.php81; };
-  php82 = handleTest ./php { php = pkgs.php82; };
-  php83 = handleTest ./php { php = pkgs.php83; };
-  php84 = handleTest ./php { php = pkgs.php84; };
+  php = import ./php/default.nix {
+    inherit runTest;
+    php = pkgs.php;
+  };
+  php81 = import ./php/default.nix {
+    inherit runTest;
+    php = pkgs.php81;
+  };
+  php82 = import ./php/default.nix {
+    inherit runTest;
+    php = pkgs.php82;
+  };
+  php83 = import ./php/default.nix {
+    inherit runTest;
+    php = pkgs.php83;
+  };
+  php84 = import ./php/default.nix {
+    inherit runTest;
+    php = pkgs.php84;
+  };
   phylactery = handleTest ./web-apps/phylactery.nix {};
   pict-rs = handleTest ./pict-rs.nix {};
   pingvin-share = handleTest ./pingvin-share.nix {} ;
@@ -1153,7 +1186,7 @@ in {
   systemd-userdbd = handleTest ./systemd-userdbd.nix {};
   systemd-homed = handleTest ./systemd-homed.nix {};
   systemtap = handleTest ./systemtap.nix {};
-  startx = runTest ./startx.nix;
+  startx = import ./startx.nix { inherit pkgs runTest; };
   taler = handleTest ./taler {};
   tandoor-recipes = handleTest ./tandoor-recipes.nix {};
   tandoor-recipes-script-name = handleTest ./tandoor-recipes-script-name.nix {};
@@ -1163,7 +1196,7 @@ in {
   tayga = handleTest ./tayga.nix {};
   technitium-dns-server = handleTest ./technitium-dns-server.nix {};
   teeworlds = handleTest ./teeworlds.nix {};
-  telegraf = handleTest ./telegraf.nix {};
+  telegraf = runTest ./telegraf.nix;
   teleport = handleTest ./teleport.nix {};
   teleports = runTest ./teleports.nix;
   thelounge = handleTest ./thelounge.nix {};
